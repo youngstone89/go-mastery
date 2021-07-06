@@ -12,7 +12,10 @@ func doSomething() {
 func main() {
 	ch := make(chan int)
 	go sendingGoRoutine(ch)
-	go receivingGoRoutine(ch)
+	receivingGoRoutine(ch)
+
+	//x := <- ch
+	//fmt.Println(x)
 
 }
 
