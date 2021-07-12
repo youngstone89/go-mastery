@@ -10,6 +10,9 @@ func main() {
 
 	data["name"] = "kim"
 	data["age"] = 31
+	valuedata := make(map[string]interface{})
+	valuedata["key"] = "abcdefg-zxvasdfa"
+	data["value"] = valuedata
 
 	doc, _ :=json.Marshal(data)
 

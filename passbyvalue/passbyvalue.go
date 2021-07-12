@@ -15,6 +15,10 @@ func main() {
 	u := User{Name: "Anna", Pet: []string{"Bailey"}} // this time we'll generate a pointer!
 	fmt.Println(u, "u before")
 	p := &u // Let's make a pointer to u!
+	m := u
+	fmt.Printf("%T, %v, %s \n", p, p, p)
+	fmt.Println(p)
+	fmt.Println(m)
 	p.newPet()
 	fmt.Println(u, "u after")
 	// Does Anna have a new pet now? Yes!
