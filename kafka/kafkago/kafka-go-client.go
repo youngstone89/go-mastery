@@ -17,12 +17,12 @@ func main() {
 	// make a new reader that consumes from topic-A, partition 0, at offset 42
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   []string{"localhost:9092"},
-		Topic:     "NMDPTRIAL_peter_freshman_nuance_com_20191015T195942962874",
+		Topic:     "yeogseok_topic_dest",
 		Partition: 0,
 		MinBytes:  10e3, // 10KB
 		MaxBytes:  10e6, // 10MB
 	})
-	r.SetOffset(42)
+	r.SetOffset(0)
 
 	for {
 		m, err := r.ReadMessage(context.Background())

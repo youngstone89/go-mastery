@@ -11,12 +11,22 @@ import (
 
 func main() {
 
-	for i := 0; i < 100; i++ {
+	//ProduceEventMessages("clientdata_test_topic_tts","TTSaaS")
+	//ProduceEventMessages("clientdata_test_topic_nlu","NLUaaS")
+	//ProduceEventMessages("clientdata_test_topic_asr","ASRaaS")
+	//ProduceEventMessages("clientdata_test_topic","ASRaaS")
+	//ProduceEventMessages("clientdata_test_topic","TTSaaS")
+	ProduceEventMessages("error_topic_5","TTSaaS")
+
+}
+
+func ProduceEventMessages(topic string, service string) {
+	for i := 0; i < 10000; i++ {
 		p, err := kafka.NewProducer(&kafka.ConfigMap{
-			"bootstrap.servers": "localhost:9092",
-			"client.id": "test",
-			"acks": "all",
-			"message.timeout.ms" : 5000,
+			"bootstrap.servers":  "localhost:9092",
+			"client.id":          "test.client1",
+			"acks":               "all",
+			"message.timeout.ms": 5000,
 		})
 
 		fmt.Printf("Failed to create producer: %s\n", p.GetFatalError())
@@ -30,13 +40,11 @@ func main() {
 			os.Exit(1)
 		}
 
-
-		value := "{\"topic\":\"yeongseok_topic\",\"key\":{\"service\":\"DLGaaS\",\"id\":\"977f87ae-5923-4281-8e91-1f1968baea7b\"},\"value\":{\"specversion\":\"1.0\",\"service\":\"DLGaaS\",\"source\":\"NIIEventLogger\",\"type\":\"NIIEventLog\",\"id\":\"977f87ae-5923-4281-8e91-1f1968baea7b\",\"timestamp\":\"2021-01-19T19:06:07.113Z\",\"appid\":\"DEMO-OMNICHANNEL-APP-DEV\",\"datacontenttype\":\"application/json\",\"data\":{\"dataContentType\":\"application/x-nuance-dlg-nii-logs.v1+json\",\"traceid\":\"8bbedbb2353cdc1d\",\"requestid\":\"2c06142d-71b7-4077-bf4b-e3892811b3d8\",\"sessionid\":\"0c234bb6-e2c4-4198-a7f7-53020b02d734\",\"locale\":\"en-US\",\"clientData\":{},\"seqid\":\"1\",\"events\":[{\"name\":\"session-start\",\"value\":{\"runtime\":{\"api\":\"v1\"},\"project\":{\"name\":\"TestMixClient\",\"namespace\":\"alex.smith@company.com\",\"deployed\":\"2020-12-10T19:52:25.224Z\",\"contextTag\":\"A1880_C1\",\"id\":\"8655\"},\"selector\":{\"channel\":\"default\",\"language\":\"en-US\"},\"version\":{\"asr\":{\"en_US\":\"2\"},\"nlu\":{\"en_US\":\"2\"},\"dlg\":\"2\"},\"user\":{\"systemID\":null,\"userChannelID\":null,\"userAuxiliaryID\":null,\"userGlobalID\":null,\"location\":null},\"timeout\":900}}]}},\"partition\":0,\"offset\":312}"
-		topic := "yeongseok_topic"
+		value := fmt.Sprintf("{\n  \"appid\": \"%s\",\n  \"data\": \n{\"clientData\": {}, \n    \"dataContentType\": \"application/x-nuance-nluaas-interpretation.v1+json\",\n    \"locale\": \"jp-JP\",\n    \"processingTime\": {\n      \"durationMs\": 45,\n      \"startTime\": \"2021-07-15T01:29:33.241Z\"\n    },\n    \"request\": {\n      \"clientData\": {},\n      \"input\": {\n        \"inputUnion\": \"text\",\n        \"text\": \"こんにちは\"\n      },\n      \"model\": {\n        \"requestTimeoutMs\": 0,\n        \"type\": \"SEMANTIC_MODEL\",\n        \"uri\": \"urn:nuance-mix:tag:model/Mobile_CS_Active_Model/mix.nlu?=language=jpn-JPN\"\n      },\n      \"parameters\": {\n        \"interpretationInputLoggingMode\": \"PLAINTEXT\",\n        \"interpretationResultType\": \"SINGLE_INTENT\",\n        \"maxInterpretations\": 0,\n        \"postProcessingScriptParameters\": {}\n      },\n      \"resources\": [],\n      \"userId\": \"\"\n    },\n    \"response\": {\n      \"result\": null,\n      \"status\": {\n        \"code\": 500,\n        \"details\": \"com.nuance.nlu.runtime.api.interpret.processor.NtpeException: com.nuance.entrd.ntpe.tokenize.NtpeException: RequestId: 5f39c494-5e41-4846-9a7b-6e1af320573f, Severity: ERROR, Summary: Error while sending request to NTpE server. ntpe-ndp-jpn-jpn-rak-4-2-0\\ncom.nuance.entrd.ntpe.tokenize.NtpeException: RequestId: 5f39c494-5e41-4846-9a7b-6e1af320573f, Severity: ERROR, Summary: Error while sending request to NTpE server. ntpe-ndp-jpn-jpn-rak-4-2-0\\nRequestId: 5f39c494-5e41-4846-9a7b-6e1af320573f, Severity: ERROR, Summary: Error while sending request to NTpE server. ntpe-ndp-jpn-jpn-rak-4-2-0\\n\",\n        \"message\": \"Internal Server Error\"\n      }\n    }\n  },\n  \"datacontenttype\": \"application/json\",\n  \"id\": \"d07b4fce-a336-4ad2-92e6-924d359284cc\",\n  \"key\": \"{\\\"service\\\":\\\"NLUaaS\\\"}\",\n  \"offset\": %d,\n  \"partition\": 0,\n  \"partitionKey\": \"{\\\"service\\\":\\\"NLUaaS\\\",\\\"id\\\":\\\"d07b4fce-a336-4ad2-92e6-924d359284cc\\\"}\",\n  \"service\": \"NLUaaS\",\n  \"source\": \"nuance.nlu.v1.Runtime/Interpret\",\n  \"specversion\": \"1.0\",\n  \"timestamp\": \"2021-07-15T01:29:33.287Z\",\n  \"topic\": \"%s\",\n  \"type\": \"Interpret\",\n  \"value\": {\n    \"appid\": \"%s\",\n    \"data\": {\n      \"dataContentType\": \"application/x-nuance-nluaas-interpretation.v1+json\",\n      \"locale\": \"jp-JP\",\n      \"processingTime\": {\n        \"durationMs\": 45,\n        \"startTime\": \"2021-07-15T01:29:33.241Z\"\n      },\n      \"request\": {\n        \"clientData\": {},\n        \"input\": {\n          \"inputUnion\": \"text\",\n          \"text\": \"こんにちは\"\n        },\n        \"model\": {\n          \"requestTimeoutMs\": 0,\n          \"type\": \"SEMANTIC_MODEL\",\n          \"uri\": \"urn:nuance-mix:tag:model/Mobile_CS_Active_Model/mix.nlu?=language=jpn-JPN\"\n        },\n        \"parameters\": {\n          \"interpretationInputLoggingMode\": \"PLAINTEXT\",\n          \"interpretationResultType\": \"SINGLE_INTENT\",\n          \"maxInterpretations\": 0,\n          \"postProcessingScriptParameters\": {}\n        },\n        \"resources\": [],\n        \"userId\": \"\"\n      },\n      \"response\": {\n        \"result\": null,\n        \"status\": {\n          \"code\": 500,\n          \"details\": \"com.nuance.nlu.runtime.api.interpret.processor.NtpeException: com.nuance.entrd.ntpe.tokenize.NtpeException: RequestId: 5f39c494-5e41-4846-9a7b-6e1af320573f, Severity: ERROR, Summary: Error while sending request to NTpE server. ntpe-ndp-jpn-jpn-rak-4-2-0\\ncom.nuance.entrd.ntpe.tokenize.NtpeException: RequestId: 5f39c494-5e41-4846-9a7b-6e1af320573f, Severity: ERROR, Summary: Error while sending request to NTpE server. ntpe-ndp-jpn-jpn-rak-4-2-0\\nRequestId: 5f39c494-5e41-4846-9a7b-6e1af320573f, Severity: ERROR, Summary: Error while sending request to NTpE server. ntpe-ndp-jpn-jpn-rak-4-2-0\\n\",\n          \"message\": \"Internal Server Error\"\n        }\n      }\n    },\n    \"datacontenttype\": \"application/json\",\n    \"id\": \"d07b4fce-a336-4ad2-92e6-924d359284cc\",\n    \"partitionKey\": \"{\\\"service\\\":\\\"%s\\\",\\\"id\\\":\\\"d07b4fce-a336-4ad2-92e6-924d359284cc\\\"}\",\n    \"service\": \"%s\",\n    \"source\": \"nuance.nlu.v1.Runtime/Interpret\",\n    \"specversion\": \"1.0\",\n    \"timestamp\": \"2021-07-15T01:29:33.287Z\",\n    \"type\": \"Interpret\"\n  }\n}",topic,i,topic,topic, service,service)
 		delivery_chan := make(chan kafka.Event, 10000)
 		err = p.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-			Value: []byte(value)},
+			Value:          []byte(value)},
 			delivery_chan,
 		)
 		if err != nil {
@@ -56,6 +64,4 @@ func main() {
 		close(delivery_chan)
 
 	}
-
-
 }
