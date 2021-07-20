@@ -1,169 +1,269 @@
-package main
-//
-//import (
-//	"encoding/json"
-//	"fmt"
-//	"github.com/confluentinc/confluent-kafka-go/kafka"
-//	"github.com/prometheus/client_golang/prometheus"
-//	"github.com/prometheus/client_golang/prometheus/promhttp"
-//	"net/http"
-//	"sync"
-//	"time"
-//)
-//
-//
-//
-//
-//func main1() {
-//	http.Handle("/metrics", promhttp.Handler())
-//	go func() {
-//		http.ListenAndServe(":8078", nil)
-//	}()
-//
-//	consumerWaiterGroup2()
-//
-//	//var wg sync.WaitGroup
-//	//for i := 0; i < 3; i++ {
-//	//	wg.Add(1)
-//	//	consumerWaiterGroup(&wg)
-//	//}
-//	//wg.Wait()
-//}
-//
-//type Counter struct {
-//	i int
-//	mu sync.Mutex
-//	elcConnectionErrorCounterVec *prometheus.CounterVec
-//}
-//var counter *Counter
-//
-//func init()  {
-//	counter = NewCounter(0)
-//	counter.elcConnectionErrorCounterVec = prometheus.NewCounterVec(
-//		prometheus.CounterOpts{
-//			Name: "elcConnectionErrorCounterVec",
-//			Help: "The number of processors configured",
-//		},[]string{"topic"})
-//	prometheus.Register(counter.elcConnectionErrorCounterVec)
-//}
-//
-//func NewCounter(i int) *Counter {
-//	return &Counter{i: i}
-//}
-//
-//func (c *Counter) increment()  {
-//	c.mu.Lock()
-//	c.i++
-//	c.mu.Unlock()
-//}
-//
-//func consumerWaiterGroup2() {
-//
-//
-//	var wg sync.WaitGroup
-//	wg.Add(1)
-//
-//	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-//		"bootstrap.servers": "localhost:9092",
-//		"group.id":          "myGroup",
-//		"auto.offset.reset": "earliest",
-//		"go.application.rebalance.enable": true,
-//	})
-//
-//	if err != nil {
-//		panic(err)
-//	}
-//	c.SubscribeTopics([]string{"yeongseok_topic"}, nil)
-//
-//	//ev := c.Events()
-//	//go func() {
-//	//	for  {
-//	//		select {
-//	//		case <- ev:
-//	//			fmt.Println(ev)
-//	//		}
-//	//	}
-//	//}()
-//
-//	//time.Sleep(time.Duration(time.Second*60))
-//	messages := make(chan map[string]interface{})
-//	go func(counter *Counter) {
-//		defer wg.Done()
-//		for  {
-//			select {
-//			case msg:= <-messages:
-//				counter.increment()
-//				msgJson, _ := json.MarshalIndent(msg,"","")
-//				counter.elcConnectionErrorCounterVec.WithLabelValues("yeongseok_topic").Inc()
-//				fmt.Printf("\n!!!!!!!! got error message from go consumer gorounte: %v",string(msgJson))
-//			}
-//
-//		}
-//
-//	}(counter)
-//
-//
-//
-//	go func(messages chan<- map[string]interface{}) {
-//		defer wg.Done()
-//		for {
-//			msg, err := c.ReadMessage(-1)
-//			//ev <- msg
-//			if err == nil {
-//				fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
-//				jsonObj := make(map[string]interface{})
-//
-//			} else {
-//				// The client will automatically try to recover from all errors.
-//				fmt.Printf("\nSending Consumer error: %v (%v)\n", err.(kafka.Error).Code(), err.(kafka.Error).String())
-//				var msgMap = make(map[string]interface{})
-//				msgMap["connectionError"] = err.(kafka.Error).String()
-//				messages <- msgMap
-//			}
-//			time.Sleep(time.Duration(2*time.Second))
-//		}
-//		c.Close()
-//	}(messages)
-//	wg.Wait()
-//	fmt.Printf("\nCounter: %v\n", counter.i)
-//
-//}
-//func consumerWaiterGroup(wgp *sync.WaitGroup) {
-//	defer wgp.Done()
-//	//var wg sync.WaitGroup
-//	//wg.Add(1)
-//
-//	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-//		"bootstrap.servers": "localhost",
-//		"group.id":          "myGroup",
-//		"auto.offset.reset": "earliest",
-//	})
-//
-//	if err != nil {
-//		panic(err)
-//	}
-//	c.SubscribeTopics([]string{"myTopic", "^aRegex.*[Tt]opic"}, nil)
-//	//ev := c.Events()
-//	//for  {
-//	//	select {
-//	//	case <- ev:
-//	//		fmt.Println(ev)
-//	//	}
-//	//}
-//	//time.Sleep(time.Duration(time.Second*60))
-//
-//	go func() {
-//		//defer wg.Done()
-//		for {
-//			msg, err := c.ReadMessage(-1)
-//			if err == nil {
-//				fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
-//			} else {
-//				// The client will automatically try to recover from all errors.
-//				fmt.Printf("Consumer error: %v (%v)\n", err.(kafka.Error).Code(), err.(kafka.Error).String())
-//			}
-//		}
-//		//c.Close()
-//	}()
-//	//wg.Wait()
-//}
+package confluentkafkago
+
+import (
+	"errors"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"log"
+	"os"
+	"os/signal"
+	"strconv"
+	"sync"
+	"syscall"
+	"time"
+)
+
+func StartConfluentKafkaConsumerProgram() {
+	retry := 0
+	maxRetry := -1
+	run := true
+
+	for run == true {
+		err := runKafkaConsumer()
+		if err != nil {
+			run = false
+		}
+		if retry > maxRetry && maxRetry > 0 {
+			run = false
+		}
+		time.Sleep(time.Duration(5 * time.Second))
+	}
+}
+
+func runKafkaConsumer() error {
+	topic := "test_topic_2"
+	//Create initial consumer
+	c, err := NewConsumer()
+
+	if err != nil {
+		return err
+	}
+
+	//Subscribe
+	err = c.Subscribe(topic, nil)
+
+	if err != nil {
+		return err
+	}
+
+	adminClient, err := kafka.NewAdminClientFromConsumer(c)
+
+	if err != nil {
+		return err
+	}
+	topicPointer := &topic
+	md, err := adminClient.GetMetadata(topicPointer, false, -1)
+
+	if err != nil {
+		return err
+	}
+
+	var partitions []float64
+	for _, v := range md.Topics[topic].Partitions {
+		partitions = append(partitions, float64(v.ID))
+	}
+
+	if len(partitions) <= 0 {
+		return errors.New("Partition Count is zero or less.")
+	}
+
+	if err != nil {
+		return err
+	}
+
+	errChan := make(chan error)
+	sigChan := make(chan os.Signal)
+	eofChan := make(chan kafka.PartitionEOF)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+
+	var wg sync.WaitGroup
+	err = c.Close()
+	if err != nil {
+		errChan <- err
+		return err
+	}
+	partitionsCount := len(partitions)
+	for p := range partitions {
+		c, err := NewConsumer()
+		if err != nil {
+			errChan <- err
+			return err
+		}
+		wg.Add(1)
+		go process(p, c, topic, topicPointer, errChan, &wg, sigChan,eofChan)
+	}
+
+	run := true
+	for run {
+		select {
+		case cerr := <-errChan:
+			run = false
+			log.Printf("Error: %s", cerr)
+		case eof := <-eofChan:
+			partitionsCount--
+			log.Printf("[Event: %s][Partition Count Now : %v]",eof,partitionsCount)
+			if partitionsCount == 0 {
+				run = false
+			}
+		}
+	}
+	wg.Wait()
+	log.Printf("================== Process Ended =========================")
+	return nil
+}
+
+func NewConsumer() (*kafka.Consumer, error) {
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers":    "localhost:9092",
+		"group.id":             "101",
+		"auto.offset.reset":    "earliest",
+		"enable.auto.commit":   "false",
+		"enable.partition.eof": "true",
+		"auto.commit.interval.ms": "5000",
+		//"go.application.rebalance.enable": true,
+		//"debug": "cgrp,topic,fetch",
+		"session.timeout.ms": "60000",
+		"heartbeat.interval.ms": "15000",
+		//"max.poll.interval.ms": "300000",
+	})
+	return c, err
+}
+
+func process(p int, c *kafka.Consumer, topic string, topicPointer *string, errChan chan error, wg *sync.WaitGroup, sigChan chan os.Signal, eofChan chan kafka.PartitionEOF) error {
+	defer wg.Done()
+	log.Printf("Partition ID:%v \n", p)
+	low, high, err := c.QueryWatermarkOffsets(topic, int32(p), -1)
+	if err != nil {
+		sendErrorToChannel(errChan, err)
+		return err
+	}
+	log.Printf("[Consumer: %s][Partition: %d][Offset Range low:%v, high:%v]  \n", c.String(),p, low, high)
+	var topicParitions []kafka.TopicPartition
+	tp := kafka.TopicPartition{
+		Topic:     topicPointer,
+		Partition: int32(p),
+	}
+	topicParitions = append(topicParitions, tp)
+	aerr := c.Assign(topicParitions)
+	if aerr != nil {
+		sendErrorToChannel(errChan, err)
+		return aerr
+	}
+	committedOffsets, err := c.Committed(topicParitions, -1)
+
+	if err != nil {
+		sendErrorToChannel(errChan, err)
+		return err
+	}
+
+	log.Printf("[Consumer: %s][Partition: %d][Committed Offsets :%v] \n", c.String(),p, committedOffsets[0].Offset.String())
+	currentOffset := committedOffsets[0].Offset
+
+	if int64(currentOffset) > high || int64(currentOffset) < low {
+		currentOffset = 0
+	}
+	log.Printf("[Consumer: %s][Partition: %d][Committed Offsets :%v] \n", c.String(),p, currentOffset)
+
+	run := true
+	offset, err := strconv.Atoi(currentOffset.String())
+	if err != nil {
+		sendErrorToChannel(errChan, err)
+		return err
+	}
+	seekTp := kafka.TopicPartition{
+		topicPointer, int32(p), kafka.Offset(offset), nil, nil,
+	}
+	serr := c.Seek(seekTp, -1)
+	if serr != nil {
+		sendErrorToChannel(errChan, err)
+		return serr
+	}
+	for run {
+		select {
+		case sig := <- sigChan:
+			log.Printf("Caught signal %v: terminating\n", sig)
+			err  := c.Close()
+			if err != nil {
+				errChan <- err
+				return err
+			}
+			run = false
+		default:
+			ev := c.Poll(100)
+			switch e := ev.(type) {
+			case *kafka.Message:
+				//record := cast(e)
+				//raw, _ := json.Marshal(record)
+				var partitionsToCommit []kafka.TopicPartition
+				tp := kafka.TopicPartition{
+					Topic:     topicPointer,
+					Partition: int32(p),
+				}
+				offset++
+				err := tp.Offset.Set(offset)
+				if err != nil {
+					sendErrorToChannel(errChan, err)
+					return err
+				}
+				partitionsToCommit = append(partitionsToCommit, tp)
+
+				committedOffsets, err := c.CommitOffsets(partitionsToCommit)
+				if err != nil {
+					sendErrorToChannel(errChan, err)
+					return err
+				}
+
+				intOffset, err := strconv.Atoi(committedOffsets[0].Offset.String())
+				if err != nil {
+					errChan <- err
+					return err
+				}
+				_, high, err := c.QueryWatermarkOffsets(topic, int32(p), -1)
+				intHigh:= int(high)
+				//intOffset, err := strconv.Atoi(committedOffsets[0].Offset.String())
+				left := intHigh - intOffset
+
+				//log.Printf("[Consumer: %s][Partition: %d][Committed Offsets :%v][Left Offsets :%d][End Offsets :%d] \n", c.String(),p, committedOffsets[0].Offset.String(),left,intHigh)
+				committedOffsetsToCheck, cerr := c.Committed(partitionsToCommit, -1)
+
+
+				if cerr != nil {
+					sendErrorToChannel(errChan, err)
+					return cerr
+				}
+				log.Printf("[Consumer: %s][Partition: %d][Committed Offsets: %v][Left Offsets :%d][End Offsets :%d] \n", c.String(),p, committedOffsetsToCheck[0].Offset.String(),left,intHigh)
+
+			case kafka.Error:
+				// Errors should generally be considered
+				// informational, the client will try to
+				// automatically recover.
+				// But in this example we choose to terminate
+				// the application if all brokers are down.
+				log.Printf("Error: %v \n: %v \n", e.Code(), e)
+				err = e
+			case kafka.PartitionEOF:
+				log.Printf("PartitionEOF [Consumer: %s][Partition: %d] \n", c.String(),p)
+				c.Unassign()
+				c.Unsubscribe()
+				eofChan <- e
+				wg.Done()
+			case kafka.OffsetsCommitted:
+				log.Printf("OffsetsCommitted [Consumer: %s][Partition: %d][OffsetCommitted Event: %v] \n", c.String(),p, e)
+
+			case kafka.AssignedPartitions:
+				log.Printf("AssignedPartitions [Consumer: %s][Partition: %d][AssignedPartitions Event: %v] \n", c.String(),p, e)
+
+			default:
+				//log.Printf("Default Event [Consumer: %s][Partition: %d][Event: %s] \n", c.String(),p,e.String())
+				//log.Printf("Default Event [Consumer: %s][Partition: %d][Event: %s] \n", c.String(),p,e)
+
+			}
+			//time.Sleep(time.Duration(5 * time.Second))
+		}
+	}
+
+	return nil
+}
+
+func sendErrorToChannel(errChan chan error, err error) {
+	errChan <- err
+}
