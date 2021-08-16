@@ -1,8 +1,10 @@
 package main
 
-import "go-mastery/reflection"
+import "go-mastery/concurrency"
 
 func main() {
 
-	reflection.DoReflectionTest()
+	// reflection.DoReflectionTest()
+	concurrency.DoRaceTest()
+
 }
