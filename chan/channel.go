@@ -6,10 +6,10 @@ var i int
 
 func doSomething() {
 	i++
-	fmt.Printf("I am doing something... %d",i)
+	fmt.Printf("I am doing something... %d", i)
 }
 
-func main() {
+func DoChannelTest() {
 	ch := make(chan int)
 	go sendingGoRoutine(ch)
 	receivingGoRoutine(ch)
@@ -20,13 +20,10 @@ func main() {
 }
 
 func receivingGoRoutine(ch chan int) {
-	v :=<- ch
-	fmt.Println("Received value",v)
+	v := <-ch
+	fmt.Println("Received value", v)
 }
 
 func sendingGoRoutine(ch chan int) {
 	ch <- 45
 }
-
-
-

@@ -1,13 +1,14 @@
 package main
 
 import (
-	"golang.org/x/sync/errgroup"
 	"log"
 	"sync"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
-func main() {
+func DoWaiterGroup() {
 	wg()
 	eg()
 }
