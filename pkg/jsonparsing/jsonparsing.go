@@ -1,11 +1,11 @@
-package main
+package jsonparsing
 
 import (
 	"encoding/json"
 	"fmt"
 )
 
-func main() {
+func doMarshalTest1() {
 	data := make(map[string]interface{})
 
 	data["name"] = "kim"

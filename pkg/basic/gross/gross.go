@@ -1,6 +1,6 @@
 package gross
 
-import b "go-mastery/basic"
+import b "go-mastery/pkg/basic"
 
 func GrossSalary() int  {
 	a, t := b.Calculation()
