@@ -1,13 +1,20 @@
 package form
 
 import (
-	"fmt"
+	"bytes"
 	"io"
+	"log"
 	"net/http"
 	"os"
 )
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	//MultipartReader를 이용해서 받은 파일을 읽는다
+	//for k,v := range r.Form {
+	//	fmt.Printf("key:%v, value:%v", k,v)
+	//	println("")
+	//}
+	//r.ParseForm()
+	//fmt.Println(r.FormValue("service"))
 	reader, err := r.MultipartReader()
 
 	//에러가 발생하면 던진다
@@ -22,8 +29,12 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 		if err == io.EOF {
 			break
 		}
-		formName := part.FormName()
-		fmt.Println(formName)
+
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(part)
+		log.Println("content: ", buf.String())
+		//formName := part.FormName()
+		//fmt.Println(part.Header, formName, part.FileName(), part)
 
 		fileDir, _ := os.Getwd()
 		//uploadedfile 디렉토리에 받았던 파일 명으로 파일을 만든다
@@ -45,7 +56,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DoReceiveTest()  {
-	http.HandleFunc("/save",saveHandler)
+	http.HandleFunc("/audio/upload",saveHandler)
 	//서버 시작
 	http.ListenAndServe(":8080", nil)
 }
