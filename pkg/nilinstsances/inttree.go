@@ -19,7 +19,7 @@ type IntTree struct {
 
 func (it *IntTree) Insert(val int) *IntTree {
 	if it == nil {
-		return &IntTree{val:val}
+		return &IntTree{val: val}
 	}
 	if val < it.val {
 		it.left = it.left.Insert(val)
