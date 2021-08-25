@@ -1,6 +1,6 @@
 package main
 
-import "go-mastery/pkg/form"
+import "go-mastery/pkg/minio"
 
 func main() {
 
@@ -12,11 +12,12 @@ func main() {
 
 	//webhook.DoWebhookTest()
 
-	form.DoReceiveTest()
+	//form.DoReceiveTest()
 	//form.DoMultipartFormTest()
 	//var wg sync.WaitGroup
 	//wg.Add(1)
 	//ticker.DoTickerTest(&wg)
 	//wg.Wait()
+	minio.DoMinioTest()
 }
 
