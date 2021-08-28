@@ -1,6 +1,8 @@
 package main
 
-import "go-mastery/pkg/minio"
+import (
+	"go-mastery/pkg/crypto"
+)
 
 func main() {
 
@@ -18,6 +20,7 @@ func main() {
 	//wg.Add(1)
 	//ticker.DoTickerTest(&wg)
 	//wg.Wait()
-	minio.DoMinioTest()
+	//minio.DoMinioTest()
+	crypto.DoCryptoTest()
 }
 
