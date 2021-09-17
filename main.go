@@ -23,4 +23,3 @@ func main() {
 	//minio.DoMinioTest()
 	crypto.DoCryptoTest()
 }
-

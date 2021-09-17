@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func DoCryptoTest()  {
+func DoCryptoTest() {
 
 	s := "NMDPTRIAL_kim_seok_nuance_com_20210427T044351526748"
 	hsha2 := sha256.Sum256([]byte(s))
