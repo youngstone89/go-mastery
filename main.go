@@ -1,8 +1,6 @@
 package main
 
-import (
-	"go-mastery/pkg/crypto"
-)
+import "go-mastery/pkg/context/googlewebsearch"
 
 func main() {
 
@@ -21,5 +19,6 @@ func main() {
 	//ticker.DoTickerTest(&wg)
 	//wg.Wait()
 	//minio.DoMinioTest()
-	crypto.DoCryptoTest()
+	// crypto.DoCryptoTest()
+	googlewebsearch.DoGoogleWebSearch()
 }
