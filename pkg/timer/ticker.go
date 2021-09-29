@@ -98,7 +98,7 @@ var event = `
 
 type Records struct {
 	val     int
-	mu      sync.RWMutex
+	mu      sync.Mutex
 	Records jsonObj
 }
 
@@ -120,7 +120,7 @@ func DoTest(LogFlushTimeoutSec int) {
 	done := make(chan int, 1)
 	now := time.Tick(time.Duration(LogFlushTimeoutSec) * time.Nanosecond)
 
-	count := 10000000
+	count := 1000
 	// Go Routine processing cache
 	go func(done chan int, now <-chan time.Time, records *Records, wg *sync.WaitGroup, counter int) {
 		for {
@@ -138,6 +138,8 @@ func DoTest(LogFlushTimeoutSec int) {
 
 	var obj jsonObj
 	err := json.Unmarshal([]byte(event), &obj)
+	_obj, err := json.Marshal(obj)
+	fmt.Printf("size in bytes: %v \n", len(_obj))
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
@@ -145,29 +147,43 @@ func DoTest(LogFlushTimeoutSec int) {
 	// Go routine adding val
 	for i := 0; i < count; i++ {
 		wg.Add(1)
-		go records.generateLoad(&wg, obj)
+		go records.generateLoad(done, &wg, obj, count)
 	}
 	wg.Wait()
 	fmt.Println(records.val)
 }
 
-func (r *Records) generateLoad(wg *sync.WaitGroup, obj jsonObj) {
+func (r *Records) generateLoad(done chan int, wg *sync.WaitGroup, obj jsonObj, counter int) {
 	defer wg.Done()
 	r.mu.Lock()
-	r.Records["records"] = append(r.Records["records"].(jsonArr), obj)
 	defer r.mu.Unlock()
+	r.Records["records"] = append(r.Records["records"].(jsonArr), obj)
+	_records, err := json.Marshal(r.Records["records"].(jsonArr))
+	if err != nil {
+		panic(err)
+	}
+	size := len([]byte(_records))
+	fmt.Printf("increased size in bytes in total: %v \n", size)
+	if size > 1*1e+3 {
+		r.processCache(done, counter)
+	}
 	// fmt.Printf("Goroutine: %v, Increments: %v \n", goid(), len(r.Records["records"].(jsonArr)))
 
 }
 
 func (r *Records) processCache(done chan int, counter int) {
 	r.mu.Lock()
-	count := len(r.Records["records"].(jsonArr))
 	defer r.mu.Unlock()
+	count := len(r.Records["records"].(jsonArr))
 	if r.Records != nil && len(r.Records) > 0 {
 		if count > 0 {
 			r.val += count
 			fmt.Printf("Goroutine: %v , Purging : %v, Total: %v \n", goid(), len(r.Records["records"].(jsonArr)), r.val)
+			_records, err := json.Marshal(r.Records["records"].(jsonArr))
+			if err != nil {
+				panic(err)
+			}
+			fmt.Printf("Purged size in bytes in total: %v \n", len([]byte(_records)))
 			if r.val == counter {
 				done <- 1
 			}
