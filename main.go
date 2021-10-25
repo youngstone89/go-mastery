@@ -20,5 +20,21 @@ func main() {
 	//wg.Wait()
 	//minio.DoMinioTest()
 	// crypto.DoCryptoTest()
+	// start := time.Now()
+	// timer.DoTest2(1)
+	// fmt.Println(time.Since(start))
+	// confluentkafkago.DoProduce()
+	// pipeline.Run()
+	// confluentkafkago.StartConfluentKafkaConsumerProgram()
+	// selecttest.Dotest()
+
+	// semaphores.DoBasic()
+	// semaphores.DoIntermediate()
+	// waitgroups.DoBasic()
+
+	// iterators.DoCallBackLoop(5)
+	// queue.DoJob(10000, 10)
 	timer.DoTest(1)
+	// timer.DoTest2(1)
+
 }

@@ -1,0 +1,38 @@
+{
+    "consumer": {
+        "name": "",
+        "config": {}
+    },
+    "processors": [
+        {
+            "name": "",
+            "transformer": {
+                "type": "",
+                "config": {}
+            },
+            "storage": [
+                {
+                    "type": "",
+                    "config": {}
+                },
+                {
+                    "type": "",
+                    "config": {}
+                },
+                {
+                    "type": "",
+                    "config": {}
+                },
+                {
+                    "type": "",
+                    "config": {}
+                }
+            ],
+            "content_type_filter": [],
+            "cache": {
+                "type": "",
+                "config": {}
+            }
+        }
+    ]
+}

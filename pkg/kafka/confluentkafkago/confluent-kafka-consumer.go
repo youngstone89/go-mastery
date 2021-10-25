@@ -2,7 +2,6 @@ package confluentkafkago
 
 import (
 	"errors"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"log"
 	"os"
 	"os/signal"
@@ -10,6 +9,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 func StartConfluentKafkaConsumerProgram() {
@@ -20,6 +21,7 @@ func StartConfluentKafkaConsumerProgram() {
 	for run == true {
 		err := runKafkaConsumer()
 		if err != nil {
+			log.Fatalf("error:%v", err)
 			run = false
 		}
 		if retry > maxRetry && maxRetry > 0 {
@@ -30,7 +32,7 @@ func StartConfluentKafkaConsumerProgram() {
 }
 
 func runKafkaConsumer() error {
-	topic := "test_topic_2"
+	topic := "NMDPTRIAL_kim_seok_nuance_com_20210427T044351526748"
 	//Create initial consumer
 	c, err := NewConsumer()
 
@@ -82,6 +84,7 @@ func runKafkaConsumer() error {
 		return err
 	}
 	partitionsCount := len(partitions)
+	start := time.Now()
 	for p := range partitions {
 		c, err := NewConsumer()
 		if err != nil {
@@ -89,7 +92,8 @@ func runKafkaConsumer() error {
 			return err
 		}
 		wg.Add(1)
-		go process(p, c, topic, topicPointer, errChan, &wg, sigChan,eofChan)
+
+		go process(p, c, topic, topicPointer, errChan, &wg, sigChan, eofChan)
 	}
 
 	run := true
@@ -100,29 +104,32 @@ func runKafkaConsumer() error {
 			log.Printf("Error: %s", cerr)
 		case eof := <-eofChan:
 			partitionsCount--
-			log.Printf("[Event: %s][Partition Count Now : %v]",eof,partitionsCount)
+			log.Printf("[Event: %s][Partition Count Now : %v]", eof, partitionsCount)
 			if partitionsCount == 0 {
 				run = false
 			}
 		}
 	}
 	wg.Wait()
+	log.Printf("Elapsed Time:%v", time.Since(start))
 	log.Printf("================== Process Ended =========================")
 	return nil
 }
 
 func NewConsumer() (*kafka.Consumer, error) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":    "localhost:9092",
-		"group.id":             "101",
-		"auto.offset.reset":    "earliest",
-		"enable.auto.commit":   "false",
-		"enable.partition.eof": "true",
-		"auto.commit.interval.ms": "5000",
+		"bootstrap.servers":         "localhost:9092",
+		"group.id":                  "102",
+		"auto.offset.reset":         "earliest",
+		"enable.auto.commit":        "false",
+		"enable.partition.eof":      "true",
+		"max.partition.fetch.bytes": 2048576,
+		"max.poll.records":          2000,
+		"enable.auto.offset.store":  "false",
 		//"go.application.rebalance.enable": true,
 		//"debug": "cgrp,topic,fetch",
-		"session.timeout.ms": "60000",
-		"heartbeat.interval.ms": "15000",
+		// "session.timeout.ms":    "60000",
+		// "heartbeat.interval.ms": "15000",
 		//"max.poll.interval.ms": "300000",
 	})
 	return c, err
@@ -136,7 +143,7 @@ func process(p int, c *kafka.Consumer, topic string, topicPointer *string, errCh
 		sendErrorToChannel(errChan, err)
 		return err
 	}
-	log.Printf("[Consumer: %s][Partition: %d][Offset Range low:%v, high:%v]  \n", c.String(),p, low, high)
+	log.Printf("[Consumer: %s][Partition: %d][Offset Range low:%v, high:%v]  \n", c.String(), p, low, high)
 	var topicParitions []kafka.TopicPartition
 	tp := kafka.TopicPartition{
 		Topic:     topicPointer,
@@ -155,13 +162,13 @@ func process(p int, c *kafka.Consumer, topic string, topicPointer *string, errCh
 		return err
 	}
 
-	log.Printf("[Consumer: %s][Partition: %d][Committed Offsets :%v] \n", c.String(),p, committedOffsets[0].Offset.String())
+	log.Printf("[Consumer: %s][Partition: %d][Committed Offsets :%v] \n", c.String(), p, committedOffsets[0].Offset.String())
 	currentOffset := committedOffsets[0].Offset
 
 	if int64(currentOffset) > high || int64(currentOffset) < low {
 		currentOffset = 0
 	}
-	log.Printf("[Consumer: %s][Partition: %d][Committed Offsets :%v] \n", c.String(),p, currentOffset)
+	log.Printf("[Consumer: %s][Partition: %d][Committed Offsets :%v] \n", c.String(), p, currentOffset)
 
 	run := true
 	offset, err := strconv.Atoi(currentOffset.String())
@@ -179,9 +186,9 @@ func process(p int, c *kafka.Consumer, topic string, topicPointer *string, errCh
 	}
 	for run {
 		select {
-		case sig := <- sigChan:
+		case sig := <-sigChan:
 			log.Printf("Caught signal %v: terminating\n", sig)
-			err  := c.Close()
+			err := c.Close()
 			if err != nil {
 				errChan <- err
 				return err
@@ -191,8 +198,7 @@ func process(p int, c *kafka.Consumer, topic string, topicPointer *string, errCh
 			ev := c.Poll(100)
 			switch e := ev.(type) {
 			case *kafka.Message:
-				//record := cast(e)
-				//raw, _ := json.Marshal(record)
+
 				var partitionsToCommit []kafka.TopicPartition
 				tp := kafka.TopicPartition{
 					Topic:     topicPointer,
@@ -206,32 +212,31 @@ func process(p int, c *kafka.Consumer, topic string, topicPointer *string, errCh
 				}
 				partitionsToCommit = append(partitionsToCommit, tp)
 
-				committedOffsets, err := c.CommitOffsets(partitionsToCommit)
+				committedOffsets, err = c.CommitOffsets(partitionsToCommit)
 				if err != nil {
 					sendErrorToChannel(errChan, err)
 					return err
 				}
 
-				intOffset, err := strconv.Atoi(committedOffsets[0].Offset.String())
+				// intOffset, err := strconv.Atoi(committedOffsets[0].Offset.String())
 				if err != nil {
 					errChan <- err
 					return err
 				}
-				_, high, err := c.QueryWatermarkOffsets(topic, int32(p), -1)
-				intHigh:= int(high)
+				// _, high, err := c.QueryWatermarkOffsets(topic, int32(p), -1)
+				// intHigh := int(high)
 				//intOffset, err := strconv.Atoi(committedOffsets[0].Offset.String())
-				left := intHigh - intOffset
+				// left := intHigh - intOffset
 
 				//log.Printf("[Consumer: %s][Partition: %d][Committed Offsets :%v][Left Offsets :%d][End Offsets :%d] \n", c.String(),p, committedOffsets[0].Offset.String(),left,intHigh)
-				committedOffsetsToCheck, cerr := c.Committed(partitionsToCommit, -1)
+				// committedOffsetsToCheck, cerr := c.Committed(partitionsToCommit, -1)
 
-
-				if cerr != nil {
-					sendErrorToChannel(errChan, err)
-					return cerr
-				}
-				log.Printf("[Consumer: %s][Partition: %d][Committed Offsets: %v][Left Offsets :%d][End Offsets :%d] \n", c.String(),p, committedOffsetsToCheck[0].Offset.String(),left,intHigh)
-
+				// if cerr != nil {
+				// 	sendErrorToChannel(errChan, err)
+				// 	return cerr
+				// }
+				// log.Printf("[Consumer: %s][Partition: %d][Committed Offsets: %v][Left Offsets :%d][End Offsets :%d] \n", c.String(), p, committedOffsetsToCheck[0].Offset.String(), left, intHigh)
+				log.Printf("e:%v", e)
 			case kafka.Error:
 				// Errors should generally be considered
 				// informational, the client will try to
@@ -241,16 +246,16 @@ func process(p int, c *kafka.Consumer, topic string, topicPointer *string, errCh
 				log.Printf("Error: %v \n: %v \n", e.Code(), e)
 				err = e
 			case kafka.PartitionEOF:
-				log.Printf("PartitionEOF [Consumer: %s][Partition: %d] \n", c.String(),p)
+				log.Printf("PartitionEOF [Consumer: %s][Partition: %d] \n", c.String(), p)
 				c.Unassign()
 				c.Unsubscribe()
 				eofChan <- e
 				wg.Done()
 			case kafka.OffsetsCommitted:
-				log.Printf("OffsetsCommitted [Consumer: %s][Partition: %d][OffsetCommitted Event: %v] \n", c.String(),p, e)
+				log.Printf("OffsetsCommitted [Consumer: %s][Partition: %d][OffsetCommitted Event: %v] \n", c.String(), p, e)
 
 			case kafka.AssignedPartitions:
-				log.Printf("AssignedPartitions [Consumer: %s][Partition: %d][AssignedPartitions Event: %v] \n", c.String(),p, e)
+				log.Printf("AssignedPartitions [Consumer: %s][Partition: %d][AssignedPartitions Event: %v] \n", c.String(), p, e)
 
 			default:
 				//log.Printf("Default Event [Consumer: %s][Partition: %d][Event: %s] \n", c.String(),p,e.String())

@@ -1,4 +1,4 @@
-package main
+package selecttest
 
 import "fmt"
 
@@ -7,8 +7,8 @@ func fibonacci(c, quit chan int) {
 	for {
 		select {
 		case c <- x:
-			x,y = y, x+y
-			fmt.Printf("Channel C Value: %v , X Value: %v, Y Value: %v \n",c,x,y)
+			x, y = y, x+y
+			fmt.Printf("Channel C Value: %v , X Value: %v, Y Value: %v \n", c, x, y)
 		//case v := <- c:
 		//	//x, y = y, x+y
 		//	fmt.Printf("Channel C Value: %v \n",v)
@@ -19,7 +19,7 @@ func fibonacci(c, quit chan int) {
 	}
 }
 
-func main() {
+func Dotest() {
 	c := make(chan int)
 	quit := make(chan int)
 	go feedChannelWithI(c, quit)
@@ -34,4 +34,3 @@ func feedChannelWithI(c chan int, quit chan int) {
 	fmt.Printf("For loop ends \n")
 	quit <- 0
 }
-

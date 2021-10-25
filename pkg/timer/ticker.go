@@ -97,9 +97,10 @@ var event = `
 `
 
 type Records struct {
-	val     int
-	mu      sync.Mutex
-	Records jsonObj
+	val       int
+	mu        sync.Mutex
+	Records   jsonObj
+	TotalSize int
 }
 
 type (
@@ -118,9 +119,9 @@ func DoTest(LogFlushTimeoutSec int) {
 	wg.Add(1)
 
 	done := make(chan int, 1)
-	now := time.Tick(time.Duration(LogFlushTimeoutSec) * time.Nanosecond)
+	now := time.Tick(time.Duration(LogFlushTimeoutSec) * time.Second)
 
-	count := 1000
+	count := 8000
 	// Go Routine processing cache
 	go func(done chan int, now <-chan time.Time, records *Records, wg *sync.WaitGroup, counter int) {
 		for {
@@ -138,8 +139,8 @@ func DoTest(LogFlushTimeoutSec int) {
 
 	var obj jsonObj
 	err := json.Unmarshal([]byte(event), &obj)
-	_obj, err := json.Marshal(obj)
-	fmt.Printf("size in bytes: %v \n", len(_obj))
+	// _obj, err := json.Marshal(obj)
+	// fmt.Printf("size in bytes: %v \n", len(_obj))
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
@@ -163,9 +164,9 @@ func (r *Records) generateLoad(done chan int, wg *sync.WaitGroup, obj jsonObj, c
 		panic(err)
 	}
 	size := len([]byte(_records))
-	fmt.Printf("increased size in bytes in total: %v \n", size)
+	// fmt.Printf("increased size in bytes in total: %v \n", size)
 	if size > 1*1e+3 {
-		r.processCache(done, counter)
+		go r.processCache(done, counter)
 	}
 	// fmt.Printf("Goroutine: %v, Increments: %v \n", goid(), len(r.Records["records"].(jsonArr)))
 
