@@ -10,6 +10,7 @@ import (
 
 func AdminGetConfigNotifyWebhook() {
 	command := exec.Command("./mc", "admin", "config", "get", "minio-local/", "notify_webhook")
+
 	// command := exec.Command("./mc", "ls", "minio-local")
 	command.Dir = "/usr/local/bin/"
 	// fmt.Println(command.Dir)
