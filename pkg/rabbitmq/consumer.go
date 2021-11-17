@@ -1,14 +1,20 @@
 package rabbitmq
 
-import "log"
+import (
+	"log"
+
+	"github.com/google/uuid"
+)
 
 type RabbitMQConsumer struct {
 	RabbitMQClient
+	ID string
 }
 
 func NewRabbitMQConsumer(client *RabbitMQClient) *RabbitMQConsumer {
 	c := &RabbitMQConsumer{
 		RabbitMQClient: *client,
+		ID:             uuid.New().String(),
 	}
 	return c
 }
@@ -27,8 +33,10 @@ func (c *RabbitMQConsumer) Consume() {
 	forever := make(chan bool)
 
 	go func() {
+		counter := 0
 		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
+			counter++
+			log.Printf("[Total:%d][Consumer:%v]Received a message: %s", counter, c, d.Body)
 		}
 	}()
 

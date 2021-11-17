@@ -7,9 +7,10 @@ import (
 )
 
 type RabbitMQClient struct {
-	conn *amqp.Connection
-	ch   *amqp.Channel
-	q    amqp.Queue
+	exchangeName string
+	conn         *amqp.Connection
+	ch           *amqp.Channel
+	q            amqp.Queue
 }
 
 func NewRabbitMQClient(host string) *RabbitMQClient {
@@ -29,28 +30,40 @@ func (r *RabbitMQClient) Close() {
 	r.conn.Close()
 	r.ch.Close()
 }
-func (r *RabbitMQClient) QueueDeclare() {
+func (r *RabbitMQClient) QueueDeclare(name string) {
 	q, err := r.ch.QueueDeclare(
-		"elc-dead-letter", // name
-		false,             // durable
-		false,             // delete when unused
-		false,             // exclusive
-		false,             // no-wait
-		nil,               // arguments
+		name,  // name
+		true,  // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 	r.q = q
 }
 
-func (r *RabbitMQClient) ExchangeDeclare() {
+func (r *RabbitMQClient) QueueBind() {
+	err := r.ch.QueueBind(
+		r.q.Name,       // queue name
+		"",             // routing key
+		r.exchangeName, // exchange
+		false,
+		nil,
+	)
+	failOnError(err, "Failed to bind a queue")
+}
+
+func (r *RabbitMQClient) ExchangeDeclare(name string, kind string) {
+	r.exchangeName = name
 	err := r.ch.ExchangeDeclare(
-		"logs",   // name
-		"fanout", // type
-		true,     // durable
-		false,    // auto-deleted
-		false,    // internal
-		false,    // no-wait
-		nil,      // arguments
+		name,  // name
+		kind,  // type
+		true,  // durable
+		false, // auto-deleted
+		false, // internal
+		false, // no-wait
+		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare an exchange")
 }
