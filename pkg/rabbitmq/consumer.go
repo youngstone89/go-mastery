@@ -2,44 +2,45 @@ package rabbitmq
 
 import (
 	"log"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 type RabbitMQConsumer struct {
 	RabbitMQClient
-	ID string
+	ID    string
+	queue string
 }
 
-func NewRabbitMQConsumer(client *RabbitMQClient) *RabbitMQConsumer {
+func NewRabbitMQConsumer(client *RabbitMQClient, name string) *RabbitMQConsumer {
 	c := &RabbitMQConsumer{
 		RabbitMQClient: *client,
 		ID:             uuid.New().String(),
+		queue:          name,
 	}
 	return c
 }
 
 func (c *RabbitMQConsumer) Consume() {
 	msgs, err := c.ch.Consume(
-		c.q.Name, // queue
-		"",       // consumer
-		true,     // auto-ack
-		false,    // exclusive
-		false,    // no-local
-		false,    // no-wait
-		nil,      // args
+		c.queue, // queue
+		"",      // consumer
+		true,    // auto-ack
+		false,   // exclusive
+		false,   // no-local
+		false,   // no-wait
+		nil,     // args
 	)
 	failOnError(err, "Failed to register a consumer")
-	forever := make(chan bool)
 
 	go func() {
 		counter := 0
 		for d := range msgs {
 			counter++
 			log.Printf("[Total:%d][Consumer:%v]Received a message: %s", counter, c, d.Body)
+			time.Sleep(1 * time.Second)
 		}
 	}()
 
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
-	<-forever
 }

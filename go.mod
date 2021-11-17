@@ -8,6 +8,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.12
 	github.com/prometheus/client_golang v1.11.0
 	github.com/qri-io/jsonschema v0.2.1
+	github.com/rabbitmq/amqp091-go v1.1.0
 	github.com/segmentio/kafka-go v0.4.16
 	github.com/streadway/amqp v1.0.0
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381

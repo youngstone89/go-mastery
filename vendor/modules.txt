@@ -78,6 +78,9 @@ github.com/qri-io/jsonpointer
 # github.com/qri-io/jsonschema v0.2.1
 ## explicit
 github.com/qri-io/jsonschema
+# github.com/rabbitmq/amqp091-go v1.1.0
+## explicit
+github.com/rabbitmq/amqp091-go
 # github.com/rs/xid v1.2.1
 github.com/rs/xid
 # github.com/segmentio/kafka-go v0.4.16
