@@ -111,6 +111,9 @@ github.com/segmentio/kafka-go/protocol/saslhandshake
 github.com/segmentio/kafka-go/sasl
 # github.com/sirupsen/logrus v1.8.1
 github.com/sirupsen/logrus
+# github.com/streadway/amqp v1.0.0
+## explicit
+github.com/streadway/amqp
 # golang.org/x/crypto v0.0.0-20201216223049-8b5274cf687f
 golang.org/x/crypto/argon2
 golang.org/x/crypto/blake2b
