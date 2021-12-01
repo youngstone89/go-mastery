@@ -7,7 +7,7 @@ import (
 )
 
 func TestConsume(t *testing.T) {
-	client := rabbitmq.NewRabbitMQClient("amqp://elc:elc@localhost:5672/")
+	client := rabbitmq.NewRabbitMQClient("amqp://user:bitnami@localhost:5672/")
 	p := rabbitmq.NewRabbitMQProducer(client)
 	p.ExchangeDeclare("elc-dead-letter-exchange", "fanout")
 	p.QueueDeclare("elc-dead-letter")

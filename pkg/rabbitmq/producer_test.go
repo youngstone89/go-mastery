@@ -7,7 +7,7 @@ import (
 )
 
 func TestPublishToQueue(t *testing.T) {
-	client := rabbitmq.NewRabbitMQClient("amqp://elc:elc@localhost:5672/")
+	client := rabbitmq.NewRabbitMQClient("amqp://user:bitnami@:::5672/")
 	p := rabbitmq.NewRabbitMQProducer(client)
 	p.QueueDeclare("elc-dead-letter")
 	p.Publish()
@@ -18,7 +18,7 @@ func TestPublishToQueue(t *testing.T) {
 }
 
 func TestPublishToExchange(t *testing.T) {
-	client := rabbitmq.NewRabbitMQClient("amqp://elc:elc@localhost:5672/")
+	client := rabbitmq.NewRabbitMQClient("amqp://user:bitnami@:::5672/")
 	p := rabbitmq.NewRabbitMQProducer(client)
 	p.ExchangeDeclare("elc-dead-letter-exchange", "fanout")
 	p.QueueDeclare("elc-dead-letter")
