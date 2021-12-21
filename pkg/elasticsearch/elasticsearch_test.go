@@ -169,7 +169,7 @@ func Test_IndexerBulkWrite(t *testing.T) {
 
 		// Retry up to 5 attempts
 		//
-		MaxRetries: 5,
+		MaxRetries: 1,
 	})
 	if err != nil {
 		log.Fatalf("Error creating the client: %s", err)
