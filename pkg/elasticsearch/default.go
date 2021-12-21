@@ -77,7 +77,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func main() {
+func BulkWrite() {
 	log.SetFlags(0)
 
 	type bulkResponse struct {
