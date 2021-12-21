@@ -1,37 +1,4 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
-//go:build ignore
-// +build ignore
-
-// This example demonstrates indexing documents using the Elasticsearch "Bulk" API
-// [https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html].
-//
-// You can configure the number of documents and the batch size with command line flags:
-//
-//     go run default.go -count=10000 -batch=2500
-//
-// The example intentionally doesn't use any abstractions or helper functions, to
-// demonstrate the low-level mechanics of working with the Bulk API: preparing
-// the meta+data payloads, sending the payloads in batches,
-// inspecting the error results, and printing a report.
-//
-//
-package main
+package elasticsearch
 
 import (
 	"bytes"
@@ -69,7 +36,7 @@ var (
 	batch int
 )
 
-func init() {
+func Init() {
 	flag.IntVar(&count, "count", 1000, "Number of documents to generate")
 	flag.IntVar(&batch, "batch", 255, "Number of documents to send in one batch")
 	flag.Parse()
@@ -77,34 +44,34 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func BulkWrite() {
-	log.SetFlags(0)
-
-	type bulkResponse struct {
-		Errors bool `json:"errors"`
-		Items  []struct {
-			Index struct {
-				ID     string `json:"_id"`
-				Result string `json:"result"`
-				Status int    `json:"status"`
-				Error  struct {
+type BulkResponse struct {
+	Errors bool `json:"errors"`
+	Items  []struct {
+		Index struct {
+			ID     string `json:"_id"`
+			Result string `json:"result"`
+			Status int    `json:"status"`
+			Error  struct {
+				Type   string `json:"type"`
+				Reason string `json:"reason"`
+				Cause  struct {
 					Type   string `json:"type"`
 					Reason string `json:"reason"`
-					Cause  struct {
-						Type   string `json:"type"`
-						Reason string `json:"reason"`
-					} `json:"caused_by"`
-				} `json:"error"`
-			} `json:"index"`
-		} `json:"items"`
-	}
+				} `json:"caused_by"`
+			} `json:"error"`
+		} `json:"index"`
+	} `json:"items"`
+}
+
+func BulkWrite() {
+	log.SetFlags(0)
 
 	var (
 		buf bytes.Buffer
 		res *esapi.Response
 		err error
 		raw map[string]interface{}
-		blk *bulkResponse
+		blk *BulkResponse
 
 		articles  []*Article
 		indexName = "articles"

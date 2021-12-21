@@ -4,6 +4,8 @@ go 1.17
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.8.2
+	github.com/dustin/go-humanize v1.0.0
+	github.com/elastic/go-elasticsearch/v7 v7.16.0
 	github.com/google/uuid v1.3.0
 	github.com/minio/minio-go/v7 v7.0.18
 	github.com/prometheus/client_golang v1.11.0
@@ -19,9 +21,8 @@ require (
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/elastic/go-elasticsearch/v7 v7.16.0 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
