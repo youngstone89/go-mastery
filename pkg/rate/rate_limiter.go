@@ -53,12 +53,10 @@ func DoBurstyLimit() {
 func DoRateLimitWithGOPackage() {
 
 	// target_per_second := 10
-	target_per_second := 1
+	target_per_second := 5
 	// target_per_second := 100
-	sec := 1.0
-	interval_sec := sec / float64(target_per_second)
-	interval_ms := interval_sec * 1000
-	rateLimiter := rate.NewLimiter(rate.Every(time.Duration(interval_ms)*time.Millisecond), 1)
+	interval := 1000.0 / float64(target_per_second)
+	rateLimiter := rate.NewLimiter(rate.Every(time.Duration(interval)*time.Millisecond), 1)
 
 	ctx := context.Background()
 
@@ -70,7 +68,7 @@ func DoRateLimitWithGOPackage() {
 	}
 	var wg sync.WaitGroup
 	start := time.Now()
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 20; i++ {
 		wg.Add(1)
 		go _process(i, &wg)
 	}
