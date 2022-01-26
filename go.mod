@@ -19,11 +19,7 @@ require (
 	gopkg.in/karalabe/cookiejar.v1 v1.0.0-20141109175019-e1490cae028c
 )
 
-require (
-	github.com/divan/gotrace v0.0.0-20160720144702-224c6918bf75 // indirect
-	github.com/elazarl/go-bindata-assetfs v1.0.1 // indirect
-	golang.org/x/tools v0.1.8 // indirect
-)
+require golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
