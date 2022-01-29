@@ -1,0 +1,160 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+      "consumer": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "name",
+          "config"
+        ]
+      },
+      "processors": {
+        "type": "array",
+        "items": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "transformer": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "config": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                },
+                "required": [
+                  "type",
+                  "config"
+                ]
+              },
+              "storage": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "config": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "additionalProperties": true,
+                    "required": [
+                      "type",
+                      "config"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "config": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "additionalProperties": true,
+                    "required": [
+                      "type",
+                      "config"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "config": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "additionalProperties": true,
+                    "required": [
+                      "type",
+                      "config"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "config": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "additionalProperties": true,
+                    "required": [
+                      "type",
+                      "config"
+                    ]
+                  }
+                ],
+                "additionalItems": true
+              },
+              "content_type_filter": {
+                "type": "array",
+                "items": {},
+                "additionalItems": true
+              },
+              "cache": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "config": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                },
+                "additionalProperties": true,
+                "required": [
+                  "type",
+                  "config"
+                ]
+              }
+            },
+            "additionalProperties": true,
+            "required": [
+              "name",
+              "transformer",
+              "storage",
+              "content_type_filter",
+              "cache"
+            ]
+          }
+        ],
+        "additionalItems": true
+      }
+    },
+    "required": [
+      "consumer",
+      "processors"
+    ]
+  }

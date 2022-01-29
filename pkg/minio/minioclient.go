@@ -2,6 +2,7 @@ package minio
 
 import (
 	"fmt"
+
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/minio/minio-go/v7/pkg/notification"
@@ -9,13 +10,13 @@ import (
 )
 
 type MinioClient struct {
-	minioClient *minio.Client
+	MinioClient *minio.Client
 }
 
 func (m *MinioClient) GetBucketNotification(ctx context.Context, bucketName string) (notification.Configuration, error) {
-	bucketNotification, err := m.minioClient.GetBucketNotification(ctx, bucketName)
+	bucketNotification, err := m.MinioClient.GetBucketNotification(ctx, bucketName)
 	if err != nil {
-		fmt.Println("Unable to set the bucket notification: ", err)
+		fmt.Println("Unable to get the bucket notification: ", err)
 		return bucketNotification, err
 	}
 	for _, queueConfig := range bucketNotification.LambdaConfigs {
@@ -37,17 +38,25 @@ func (m *MinioClient) GetBucketNotification(ctx context.Context, bucketName stri
 	return bucketNotification, err
 }
 
-func (m *MinioClient) SetBucketNotification(ctx context.Context, bucketName string,partition string, service string, region string, accountId string, resource string, events []notification.EventType ) error {
-
-	queueArn := notification.NewArn(partition,service,region,accountId,resource)
+func (m *MinioClient) SetBucketNotification(ctx context.Context, bucketName string, partition string, service string, region string, accountId string, resource string, events []notification.EventType) error {
+	//arn:minio:sqs::1:webhook
+	// partitio = minio
+	// service = sqs
+	// region = ?
+	// accountid = 1
+	// resource = webhook
+	//"arn:" + arn.Partition + ":" + arn.Service + ":" + arn.Region + ":" + arn.AccountID + ":" + arn.Resource
+	queueArn := notification.NewArn(partition, service, region, accountId, resource)
+	fmt.Printf("%s \n", queueArn)
 	//
 	queueConfig := notification.NewConfig(queueArn)
 	queueConfig.AddEvents(events...)
+	fmt.Printf("%s \n", events)
 	//
 	config := notification.Configuration{}
 	config.AddQueue(queueConfig)
-	//
-	return m.minioClient.SetBucketNotification(ctx, bucketName,config)
+	fmt.Printf("%v \n", queueConfig)
+	return m.MinioClient.SetBucketNotification(ctx, bucketName, config)
 }
 func NewMinioClient(endpoint string, accessKeyId string, secretAccessKey string, useSSL bool) *MinioClient {
 	// Initialize minio client object.
@@ -58,32 +67,30 @@ func NewMinioClient(endpoint string, accessKeyId string, secretAccessKey string,
 	if err != nil {
 		return nil
 	}
-	return &MinioClient{minioClient: minioClient}
+	return &MinioClient{MinioClient: minioClient}
 }
 
-func DoMinioTest()  {
-	minioClient := NewMinioClient("localhost:9000","minio","minio123",false)
+func DoMinioTest() {
+	minioClient := NewMinioClient("localhost:9000", "minio", "minio123", false)
 	if minioClient == nil {
 		return
 	}
 	bucket := "audio-logs"
 	_, err := minioClient.GetBucketNotification(context.Background(), bucket)
 	if err != nil {
-		fmt.Println("Failed to get bucket notification configurations for",bucket, err)
+		fmt.Println("Failed to get bucket notification configurations for", bucket, err)
 		return
 	}
-	err = minioClient.SetBucketNotification(context.Background(),bucket,"minio","sqs","us-east-1","2","kafka",[]notification.EventType{notification.ObjectCreatedPut})
+	err = minioClient.SetBucketNotification(context.Background(), bucket, "minio", "sqs", "us-east-1", "1004", "webhook", []notification.EventType{notification.ObjectCreatedPut})
 	//err = minioClient.SetBucketNotification(context.Background(),bucket,"minio","sqs","us-east-1","2","kafka",[]notification.EventType{notification.ObjectCreatedPut})
 	if err != nil {
-		fmt.Println("Failed to get bucket notification configurations for",bucket, err)
+		fmt.Println("Failed to get bucket notification configurations for", bucket, err)
 		return
 	}
 	_, err = minioClient.GetBucketNotification(context.Background(), bucket)
 	if err != nil {
-		fmt.Println("Failed to get bucket notification configurations for",bucket, err)
+		fmt.Println("Failed to get bucket notification configurations for", bucket, err)
 		return
 	}
 
 }
-
-
