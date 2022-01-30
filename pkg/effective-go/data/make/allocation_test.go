@@ -20,3 +20,7 @@ func Test_AllocateSliceStructureWithMake(t *testing.T) {
 	make.AllocateSliceStructureWithMake()
 
 }
+func Test_SumWithArrayPointer(t *testing.T) {
+	make.SumWithArrayPointer()
+
+}

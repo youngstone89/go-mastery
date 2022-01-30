@@ -42,3 +42,17 @@ func AllocateSliceStructureWithMake() {
 	var v []int = make([]int, 100) // the slice v now refers to a new array of 100 ints
 	fmt.Printf("%T %v %v\n", v, v, &v)
 }
+
+func SumWithArrayPointer() {
+	// But even this style isn't idiomatic Go. Use slices instead.
+	_sum := func(a *[3]float64) (sum float64) {
+		for _, v := range *a {
+			sum += v
+		}
+		return
+	}
+	array := [...]float64{7.0, 8.5, 9.1}
+	x := _sum(&array) // Note the explicit address-of operator
+	fmt.Println(x)
+
+}
