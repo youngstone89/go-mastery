@@ -1,10 +1,5 @@
 package main
 
-import (
-	"go-mastery/pkg/crypto"
-	"go-mastery/pkg/timer"
-)
-
 func main() {
 
 	//confluentkafkago.DoProduce()
@@ -22,27 +17,9 @@ func main() {
 	//ticker.DoTickerTest(&wg)
 	//wg.Wait()
 	//minio.DoMinioTest()
-<<<<<<< HEAD
-	crypto.DoCryptoTest()
-}
-=======
-	// crypto.DoCryptoTest()
-	// start := time.Now()
-	// timer.DoTest2(1)
-	// fmt.Println(time.Since(start))
-	// confluentkafkago.DoProduce()
-	// pipeline.Run()
-	// confluentkafkago.StartConfluentKafkaConsumerProgram()
-	// selecttest.Dotest()
-
-	// semaphores.DoBasic()
-	// semaphores.DoIntermediate()
-	// waitgroups.DoBasic()
->>>>>>> development
 
 	// iterators.DoCallBackLoop(5)
 	// queue.DoJob(10000, 10)
-	timer.DoTest(1)
 	// timer.DoTest2(1)
 
 }
