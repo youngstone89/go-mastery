@@ -23,4 +23,26 @@ func TestCompositLiteral(t *testing.T) {
 	arrPointer2 := arrPointer
 	arrPointer[0] = "there"
 	fmt.Printf("%T %v  %v \n", arrPointer2, arrPointer2, arrPointer2[0])
+
+	slice := n.NewSliceWithLiteral()
+	slice[0] = "b"
+	slice2 := slice
+	fmt.Printf("%T %v  %v \n", slice, slice, slice[0])
+	fmt.Printf("%T %v  %v \n", slice2, slice2, slice2[0])
+
+	m := n.NewMapWithLiteral()
+	fmt.Printf("%T %v  %v \n", m, m, m[0])
+
+}
+
+func TestArraysWithCompositLiteral(t *testing.T) {
+	n.NewArraysWithCompositLiteral()
+}
+
+func TestArraysWithCompositLiteralOutOfBounds(t *testing.T) {
+	n.NewArraysWithCompositLiteralOutOfBounds()
+}
+
+func TestSliceWithCompositLiteral(t *testing.T) {
+	n.NewSliceWithCompositLiteral()
 }
