@@ -46,3 +46,24 @@ func TestArraysWithCompositLiteralOutOfBounds(t *testing.T) {
 func TestSliceWithCompositLiteral(t *testing.T) {
 	n.NewSliceWithCompositLiteral()
 }
+
+func TestNewMapWithCompositLiteral(t *testing.T) {
+	m := n.NewMapWithCompositLiteral()
+	v := m["UCT"]
+	//zero value for the type of entries in the map is returend
+	// when the entry type is integer, the returning zero value is 0
+	fmt.Printf("value: %v \n", v)
+}
+
+func TestCommaOkayIdom(t *testing.T) {
+	rs := n.CommaOkIdom("X")
+	fmt.Printf("value: %v \n", rs)
+	rs = n.CommaOkIdom("PST")
+	fmt.Printf("value: %v \n", rs)
+}
+
+func TestCommaOkayIdomClosure(t *testing.T) {
+	tz := n.CommaOkIdomClosure()
+	tz()["UTC"] = 1
+	tz()
+}

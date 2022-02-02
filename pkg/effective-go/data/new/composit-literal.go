@@ -2,6 +2,7 @@ package new
 
 import (
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -28,8 +29,8 @@ func NewArraysWithCompositLiteral() {
 }
 
 func NewArraysWithCompositLiteralOutOfBounds() {
-	a := [...]string{Enone: "no error", Eio: "Eio", Einval: "invalid argument"}
-	fmt.Printf("%T %v %v %v", a, a[0], a[1], a[2], a[3])
+	// a := [...]string{Enone: "no error", Eio: "Eio", Einval: "invalid argument"}
+	// fmt.Printf("%T %v %v %v", a, a[0], a[1], a[2], a[3])
 }
 func NewSliceWithCompositLiteral() {
 	s := []string{0: "no error", 1: "Eio", 2: "invalid argument"}
@@ -46,4 +47,44 @@ func NewSliceWithLiteral() []string {
 
 func NewMapWithLiteral() map[int]string {
 	return map[int]string{0: "no error", 1: "Eio", 2: "invalid argument"}
+}
+
+func NewMapWithCompositLiteral() map[string]int {
+	var timeZone = map[string]int{
+		"UTC": 0 * 60 * 60,
+		"EST": -5 * 60 * 60,
+		"CST": -6 * 60 * 60,
+		"MST": -7 * 60 * 60,
+		"PST": -8 * 60 * 60,
+	}
+	return timeZone
+}
+func CommaOkIdom(tz string) int {
+	var timeZone = map[string]int{
+		"UTC": 0 * 60 * 60,
+		"EST": -5 * 60 * 60,
+		"CST": -6 * 60 * 60,
+		"MST": -7 * 60 * 60,
+		"PST": -8 * 60 * 60,
+	}
+	if seconds, ok := timeZone[tz]; ok {
+		return seconds
+	}
+	log.Println("unknown time zone:", tz)
+	return 0
+}
+func CommaOkIdomClosure() func() map[string]int {
+	var timeZone = map[string]int{
+		"UTC": 0 * 60 * 60,
+		"EST": -5 * 60 * 60,
+		"CST": -6 * 60 * 60,
+		"MST": -7 * 60 * 60,
+		"PST": -8 * 60 * 60,
+	}
+	return func() map[string]int {
+		defer func() {
+			fmt.Printf("defer : %v \n", timeZone)
+		}()
+		return timeZone
+	}
 }
