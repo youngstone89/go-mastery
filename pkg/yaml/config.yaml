@@ -1,0 +1,12 @@
+database:
+  Type: mysql
+  User: Riverandeye
+  Password: hello
+  Host: 1.2.3.4:5
+  Name: todo
+  TablePrefix: todo_
+server:
+  RunMode: debug
+  HTTPPort: 4000
+  ReadTimeout: 60
+  WriteTimeout: 60
