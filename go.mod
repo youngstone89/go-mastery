@@ -7,6 +7,7 @@ require (
 	github.com/confluentinc/confluent-kafka-go v1.8.2
 	github.com/dustin/go-humanize v1.0.0
 	github.com/elastic/go-elasticsearch/v7 v7.16.0
+	github.com/ghodss/yaml v1.0.0
 	github.com/google/uuid v1.3.0
 	github.com/minio/minio-go/v7 v7.0.18
 	github.com/prometheus/client_golang v1.11.0
