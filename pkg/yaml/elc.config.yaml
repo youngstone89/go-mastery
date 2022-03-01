@@ -1,0 +1,42 @@
+- consumer:
+    name: mix3_log_api_client
+    config:
+      credentials:
+        auth_disabled: false
+        token_url: https://auth.crt.nuance.com/oauth2/token
+        scope: log
+        client_id: appID:Rakuten-VA-Assistant-Prod:geo:us:clientName:nuance-ent-ps-log-producer
+        client_secret: n_o_At2JjXma_vMVviiHeqK8xNGRFVMflwXDAXcOhkA
+        auth_timeout_ms: 5000
+      max_retries: -1
+      retry_delay: 5
+      record_check_frequency: 6
+      client_name: default
+      consumer_group_id: 01
+      api_url: https://log.api.nuance.com
+      consumer_options:
+        auto.offset.reset: earliest
+      partitions: [0, 1, 2, 3]
+  processors:
+    - name: bi-analytics
+      transformer:
+        type: default
+        config: {}
+      storage:
+        - type: elasticsearch
+          config:
+            addresses:
+              - http://elasticsearch-master.nuance-analytics:9200
+            workerpool:
+              size: 1
+            rate_limit:
+              limit: 10
+              burst: 1
+      content_type_filter: []
+      cache:
+        type: redis
+        config:
+          addr: redis-master.analytics:6379
+          password: RedisIsGreat
+          db: 7
+          default_ttl: 900

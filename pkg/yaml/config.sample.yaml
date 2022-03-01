@@ -1,0 +1,149 @@
+- consumer:
+    config:
+      client_name: default
+      consumer_options:
+        auto.offset.reset: earliest
+        bootstrap.servers: localhost:9092
+        enable.auto.commit: "false"
+        enable.partition.eof: "true"
+        group.id: "01"
+        heartbeat.interval.ms: "15000"
+        session.timeout.ms: "60000"
+      max_retries: -1
+      record_check_frequency: 15
+      retry_delay: 5
+      topic: PROVIDE AN APP ID
+    name: confluent_kafka_client
+  processors:
+  - cache:
+      config:
+        cleanup_interval: 300
+        expiration: 2880
+      type: local
+    content_type_filter: []
+    name: nuance-mix3
+    storage:
+    - config:
+        addresses:
+        - http://localhost:9200
+        rate_limit:
+          burst: 1
+          limit: 10
+        workerpool:
+          size: 1
+      type: elasticsearch
+    - config:
+        path: default-processor-logs/customerA-appname-dev
+        rate_limit:
+          burst: 1
+          limit: 10
+        workerpool:
+          size: 1
+      type: filesystem
+    - config:
+        access_key_id: minio
+        endpoint: localhost:9000
+        rate_limit:
+          burst: 1
+          limit: 10
+        secret_access_key: minio123
+        use_ssl: false
+        workerpool:
+          size: 1
+      type: s3
+    - config:
+        api_url: https://log.api.nuance.com/producers
+        cache:
+          config:
+            addr: localhost:6379
+            db: 0
+            default_ttl: 900
+            password: provide redis password
+          type: redis
+        connect_timeout_ms: 5000
+        credentials:
+          auth_disabled: false
+          auth_timeout_ms: 5000
+          client_id: PROVIDE A CLIENT ID
+          client_secret: PROVIDE A CLIENT SECRET
+          scope: log
+          token_url: https://auth.crt.nuance.com/oauth2/token
+        delay: 5
+        log_flush_timeout_sec: 5
+        max_retries: -1
+        rate_limit:
+          burst: 1
+          limit: 10
+        threshold_bytes: 500000
+        workerpool:
+          size: 1
+      type: nuance-mix3
+    transformer:
+      config:
+        kv_mappings:
+          app_id: 'OPTIONAL: PROVIDE A TARGET MIX 3 APP ID TO MAP KAFKA TOPIC TO'
+      type: nuance-mix3
+- consumer:
+    config:
+      api_url: http://localhost:8082
+      client_name: default
+      consumer_group_id: "01"
+      consumer_options:
+        auto.offset.reset: earliest
+      credentials:
+        auth_disabled: false
+        auth_timeout_ms: 5000
+        client_id: PROVIDE A CLIENT ID
+        client_secret: PROVIDE A CLIENT SECRET
+        scope: log
+        token_url: https://auth.crt.nuance.com/oauth2/token
+      max_retries: -1
+      record_check_frequency: 6
+      retry_delay: 5
+    name: mix3_log_api_client
+  processors:
+  - cache:
+      config:
+        cleanup_interval: 300
+        expiration: 2880
+      type: local
+    content_type_filter:
+    - application/x-nuance-nluaas-interpretation.v1+json
+    - application/x-nuance-asr-finalresultresponse.v2+json
+    - application/x-nuance-asr-partialresultresponse.v2+json
+    - application/x-nuance-asr-recognitioninitmessage.v2+json
+    - application/x-nuance-asr-statusresponse.v2+json
+    - application/x-nuance-asr-startspeechresponse.v2+json
+    name: default
+    storage:
+    - config:
+        addresses:
+        - http://localhost:9200
+        rate_limit:
+          burst: 1
+          limit: 10
+        workerpool:
+          size: 1
+      type: elasticsearch
+    - config:
+        path: default-processor-logs/customerB-appname-dev
+        rate_limit:
+          burst: 1
+          limit: 10
+        workerpool:
+          size: 1
+      type: filesystem
+    - config:
+        access_key_id: XKIA3SFRSHAXP3MWVOVX
+        endpoint: nuance-bucket.s3.us-east-1.amazonaws.com
+        rate_limit:
+          burst: 1
+          limit: 10
+        secret_access_key: X6EFhWAHQQlwnnCKl9MIj6B5Y3RuGyEIarSo3ubx
+        use_ssl: true
+        workerpool:
+          size: 1
+      type: s3
+    transformer:
+      config: {}
+      type: default

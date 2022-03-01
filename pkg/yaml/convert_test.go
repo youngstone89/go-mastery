@@ -20,3 +20,13 @@ func TestUnMarshallYamlToMap(t *testing.T) {
 func TestUnMarshalJsonYamlStruct(t *testing.T) {
 	yaml.UnMarshalJsonYamlStruct()
 }
+
+func TestConvertJsonConfigToYaml(t *testing.T) {
+	yaml.ConvertJsonConfigToYaml()
+
+}
+
+func TestLoadElcConfigYaml(t *testing.T) {
+	yaml.LoadElcConfigYaml()
+
+}
