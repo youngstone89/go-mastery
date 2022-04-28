@@ -6,83 +6,114 @@ import (
 	"testing"
 )
 
+// find the longest substring without repeating characters
 func TestLongestSubstring(t *testing.T) {
 	testCases := []struct {
-		desc  string
-		input string
+		desc   string
+		input  string
+		expect string
+		output int
 	}{
 		{
-			desc:  "abcabcbb",
-			input: "abcabcbb",
+			desc:   "abcabcbb",
+			input:  "abcabcbb",
+			expect: "abc",
+			output: 3,
 		},
 		{
-			desc:  "bbbbb",
-			input: "bbbbb",
+			desc:   "bbbbb",
+			input:  "bbbbb",
+			expect: "b",
+			output: 1,
 		},
 		{
-			desc:  "pwwkew",
-			input: "pwwkew",
+			desc:   "pwwkew",
+			input:  "pwwkew",
+			expect: "wke",
+			output: 3,
 		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			output, length := lengthOfLongestSubstring(tC.input)
-			t.Log(output, length)
+			if tC.output != length {
+				t.Fail()
+			}
+			if tC.expect != output {
+				t.Fail()
+			}
+			t.Logf("passed %s, %d", output, length)
 		})
 	}
 }
 
 func lengthOfLongestSubstring(s string) (string, int) {
-	output := ""
-	length := 0
 
-	//the longest substring
-	// should know very case of substring of a string
-	// "abcabcbb"
-	// length = 8
-	// index = 0, cases = 8
-	// a, ab, abc, abca, abcab, abcabc, abacbcb, abcabcbb
-	// a=arr[:0]=[:idx]
-	// ab=arr[0:1]=[idx:+1]
-	// abc=arr[0:2]=[idx:+2]
-	// abcabcbb=arr[0:7]=[idx:len-1]
-	// without repeating
-	// dup check?
-	// make char arr
-	// compare every single char one by one
-	// if ther is any dupe, filter out
-	// this way, you can sort out substrings that don't have repeated characters.
-	// and repeat this throughout all index's cases
-	// and find the longest one among them.
-
-	// b, bc, bca, bcab, babc, bvabcb, bacbcbb
-	// index = 1, cases = 7
-	// c, ca, cab, cabc, cabcb, cabcbb,
-	// ....
-	// b, bb
-	// index = 6, cases = 2
-	// b
-	// index = 7, cases = 1
-
+	var outputList []string
 	charArr := []rune(s)
+	// outer loop
 	for i := 0; i < len(charArr); i++ {
-		substrArr := make([]string, len(charArr))
-		for j := i; j < len(charArr)-1; j++ {
-			subCharArr := charArr[0:j]
-			if j == 0 {
-				substrArr = append(substrArr, string(charArr[0:j]))
+
+		var outerLoopOutput []string
+
+		// inner loop
+	INNER:
+		for j := i + 1; j < len(charArr); j++ {
+
+			// map for checking repetitiveness of character
+			distinctMap := make(map[string]int)
+
+			s := charArr[:j]
+			substrCharArr := []rune(s)
+
+			// check if idstinctMap has the character, if not put it with # of appearance.
+			for _, v := range substrCharArr {
+				s := string(v)
+				if _, exist := distinctMap[s]; exist {
+					// increase by 1
+					distinctMap[s] += 1
+				} else {
+					// set to 1
+					distinctMap[s] = 1
+				}
 			}
-			// if dup? continue
-			compStr := ""
-			if !isDup(subCharArr, compStr, substrArr) {
-				substrArr = append(substrArr, string(charArr[0:j]))
+
+			// check repetition
+			for _, v := range distinctMap {
+				if v > 1 {
+					fmt.Printf("\n %s has repetitive characters", string(s))
+					continue INNER
+				}
 			}
+			fmt.Printf("\n %s has passed repetitiveness check", string(s))
+			outerLoopOutput = append(outerLoopOutput, string(s))
 
 		}
-		fmt.Println(substrArr)
+		longest := 0
+		longestStr := ""
+		// find the longest one in ordered list
+		for _, s := range outerLoopOutput {
+			cArr := []rune(s)
+			length := len(cArr)
+			if longest < length {
+				longest = length
+				longestStr = s
+			}
+		}
+		outputList = append(outputList, longestStr)
 	}
 
-	return output, length
+	var output string
+	var size int
+	for _, s := range outputList {
+		b := []byte(s)
+		if size < len(b) {
+			size = len(b)
+			output = s
+		}
+	}
+
+	return output, size
 }
 
 func isDup(subCharArr []rune, compStr string, substrArr []string) bool {
