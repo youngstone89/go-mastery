@@ -63,7 +63,7 @@ func lengthOfLongestSubstring(s string) (string, int) {
 			// map for checking repetitiveness of character
 			distinctMap := make(map[string]int)
 
-			s := charArr[:j]
+			s := charArr[i:j]
 			substrCharArr := []rune(s)
 
 			// check if idstinctMap has the character, if not put it with # of appearance.
