@@ -131,3 +131,9 @@ func TestProduceMultiple(t *testing.T) {
 	wg.Wait()
 
 }
+
+func TestProduceMockData(t *testing.T) {
+
+	confluentkafkago.ProduceEventMessages("mock2")
+
+}

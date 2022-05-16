@@ -18,7 +18,7 @@ func DoProduce() {
 	//ProduceEventMessages("clientdata_test_topic_asr","ASRaaS")
 	//ProduceEventMessages("clientdata_test_topic","ASRaaS")
 	//ProduceEventMessages("clientdata_test_topic","TTSaaS")
-	ProduceEventMessages("partition_test", "DLGaaS")
+	// ProduceEventMessages("partition_test", "DLGaaS")
 
 }
 
@@ -106,23 +106,22 @@ func (c *ConfluentKafkaProducer) ProduceMessage(key string, value string) error 
 
 }
 
-func ProduceEventMessages(topic string, service string) {
+func ProduceEventMessages(topic string) {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.servers":  "localhost:9092",
-		"client.id":          "test.client1",
-		"acks":               "all",
-		"message.timeout.ms": 5000,
+		"bootstrap.servers": "localhost:9092",
+		"group.id":          "group1",
 	})
 
-	for i := 0; i < 10000000; i++ {
-
+	if err != nil {
+		fmt.Printf("Failed to create producer: %s\n", err)
 		fmt.Printf("Failed to create producer: %s\n", p.GetFatalError())
+		os.Exit(1)
+	}
+	for i := 0; i < 100; i++ {
 
-		if err != nil {
-			fmt.Printf("Failed to create producer: %s\n", err)
-			os.Exit(1)
-		}
-		value := ``
+		value := `{
+			"hi": "there",
+		}`
 		delivery_chan := make(chan kafka.Event, 10000)
 		err = p.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
