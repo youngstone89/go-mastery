@@ -1,7 +1,9 @@
 package rabbitmq
 
 import (
-	"log"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 
 	"github.com/streadway/amqp"
 )
@@ -19,39 +21,30 @@ func NewRabbitMQProducer(client *RabbitMQClient) *RabbitMQProducer {
 
 func (r *RabbitMQProducer) Publish() {
 
-	body := `
-	{
-		"envelope": {
-			"letter": {
-				"records": [
-					{
-						"key": "some key",
-						"partition":"0",
-						"offset": "0"
-					}
-				]
-			},
-			"error": {
-				"retry_count": 1,
-				"description": "some error message",
-				"reason": "some cause"
-			}
+	data, err := ioutil.ReadFile("earthquake.json")
+	if err != nil {
+		fmt.Errorf(err.Error())
+	}
+	var jsonArr []interface{}
+	err = json.Unmarshal(data, &jsonArr)
+	if err != nil {
+		fmt.Errorf(err.Error())
+	}
+	for _, obj := range jsonArr {
+		data, _ := json.Marshal(obj)
+		err := r.ch.Publish(
+			"",       // exchange
+			r.q.Name, // routing key
+			false,    // mandatory
+			false,    // immediate
+			amqp.Publishing{
+				DeliveryMode: amqp.Persistent,
+				ContentType:  "text/plain",
+				Body:         []byte(data),
+			})
+		if err != nil {
+			fmt.Errorf(err.Error())
 		}
 	}
-	`
-
-	err := r.ch.Publish(
-		"",       // exchange
-		r.q.Name, // routing key
-		false,    // mandatory
-		false,    // immediate
-		amqp.Publishing{
-			DeliveryMode: amqp.Persistent,
-			ContentType:  "text/plain",
-			Body:         []byte(body),
-		})
-	failOnError(err, "Failed to publish a message")
-
-	log.Printf(" [x] Sent %s", body)
 
 }
