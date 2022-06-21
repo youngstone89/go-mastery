@@ -4,9 +4,36 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/streadway/amqp"
 )
+
+type RabbitMQClient struct {
+	exchangeName string
+	conn         *amqp.Connection
+	ch           *amqp.Channel
+	q            amqp.Queue
+}
+
+func NewRabbitMQClient(host string) *RabbitMQClient {
+	conn, err := amqp.Dial(host)
+	failOnError(err, "Failed to connect to RabbitMQ")
+
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to open a channel")
+
+	rc := &RabbitMQClient{
+		conn: conn,
+		ch:   ch,
+	}
+	return rc
+}
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+	}
+}
 
 type RabbitMQProducer struct {
 	RabbitMQClient
@@ -19,7 +46,7 @@ func NewRabbitMQProducer(client *RabbitMQClient) *RabbitMQProducer {
 	return p
 }
 
-func (r *RabbitMQProducer) Publish() {
+func (r *RabbitMQProducer) Publish(file string) {
 
 	data, err := ioutil.ReadFile("earthquake.json")
 	if err != nil {

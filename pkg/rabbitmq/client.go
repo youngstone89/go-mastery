@@ -46,7 +46,7 @@ func (r *RabbitMQClient) QueueDeclare(name string) {
 func (r *RabbitMQClient) QueueBind() {
 	err := r.ch.QueueBind(
 		r.q.Name,       // queue name
-		"",             // routing key
+		r.q.Name,       // routing key
 		r.exchangeName, // exchange
 		false,
 		nil,
