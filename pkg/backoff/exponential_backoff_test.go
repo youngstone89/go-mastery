@@ -3,6 +3,7 @@ package backoff
 import (
 	"errors"
 	"fmt"
+	"log"
 	"testing"
 	"time"
 
@@ -59,6 +60,21 @@ func TestExponentialBackoffWithMaxRetriesReturnTransientErrorWithMaxElaspedTime2
 	fmt.Println(err)
 }
 
+func TestRetryNotifyExponentialBackoffWithMaxRetriesReturnTransientErrorWithMaxElaspedTime2Seconds(t *testing.T) {
+	exponentialBackOff := bff.NewExponentialBackOff()
+	exponentialBackOff.MaxElapsedTime = 2 * time.Second
+	backoffWithRetries := bff.WithMaxRetries(exponentialBackOff, 5)
+	operation := func() error {
+		fmt.Println("operating...")
+		return errors.New("transient error")
+	}
+	notify := func(err error, t time.Duration) {
+		fmt.Println(err, t)
+	}
+	err := bff.RetryNotify(operation, backoffWithRetries, notify)
+	fmt.Println(err)
+}
+
 func TestExponentialBackoffWithMaxRetriesReturnTransientErrorWithMaxElaspedTime10Seconds(t *testing.T) {
 	exponentialBackOff := bff.NewExponentialBackOff()
 	exponentialBackOff.MaxElapsedTime = 10 * time.Second
@@ -82,4 +98,66 @@ func TestBackoffWithMaxRetries(t *testing.T) {
 
 	err := bff.Retry(operation, backoffWithRetries)
 	fmt.Println(err)
+}
+
+func TestPermanentErrorIsTarget(t *testing.T) {
+	err := errors.New("40904")
+	pErr1 := bff.Permanent(err)
+	result := pErr1.(*bff.PermanentError).Is(err)
+	fmt.Println(result)
+}
+
+func TestTicker(t *testing.T) {
+
+	operation := func() error {
+		fmt.Println("operating...")
+		return errors.New("transient error")
+	}
+	exponentialBackOff := bff.NewExponentialBackOff()
+	exponentialBackOff.MaxElapsedTime = 10 * time.Second
+	backoffWithRetries := bff.WithMaxRetries(exponentialBackOff, 5)
+
+	ticker := bff.NewTicker(backoffWithRetries)
+
+	var err error
+	for range ticker.C {
+		if err = operation(); err != nil {
+			log.Println(err, "wil retry...")
+			continue
+		}
+		ticker.Stop()
+		break
+	}
+
+	if err != nil {
+		log.Println(err)
+	}
+
+}
+
+func TestZeroBackoff(t *testing.T) {
+
+	operation := func() error {
+		fmt.Println("operating...")
+		return errors.New("transient error")
+	}
+	zeroBackOff := &bff.ZeroBackOff{}
+	backoffWithRetries := bff.WithMaxRetries(zeroBackOff, 5)
+
+	ticker := bff.NewTicker(backoffWithRetries)
+
+	var err error
+	for range ticker.C {
+		if err = operation(); err != nil {
+			log.Println(err, "wil retry...")
+			continue
+		}
+		ticker.Stop()
+		break
+	}
+
+	if err != nil {
+		log.Println(err)
+	}
+
 }
