@@ -69,7 +69,7 @@ require (
 )
 
 require (
-	github.com/cenkalti/backoff/v4 v4.1.2
+	github.com/cenkalti/backoff/v4 v4.1.3
 	github.com/golang/mock v1.4.4
 	github.com/prometheus/client_golang v1.7.1
 	github.com/spf13/pflag v1.0.5
