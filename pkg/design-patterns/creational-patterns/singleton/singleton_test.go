@@ -2,26 +2,32 @@ package singleton_test
 
 import "testing"
 
+// super type
 type Singleton interface {
 	AddOne() int
 }
 
+// sub type
 type singleton struct {
 	count int
 }
 
+// duck typing to Singleton interface
+func (s *singleton) AddOne() int {
+	s.count++
+	return s.count
+}
+
 var instance *singleton
 
+// get instance function that returns Singleton interface
 func GetInstance() Singleton {
 	if instance == nil {
 		instance = new(singleton)
 	}
 	return instance
 }
-func (s *singleton) AddOne() int {
-	s.count++
-	return s.count
-}
+
 func TestGetInstance(t *testing.T) {
 	counter1 := GetInstance()
 
