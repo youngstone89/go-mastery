@@ -7,15 +7,19 @@ package context_test
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"testing"
 	"time"
 )
 
-const shortDuration = 1 * time.Millisecond // a reasonable duration to block in an example
+const shortDuration = 1 * time.Second // a reasonable duration to block in an example
 
 // This example demonstrates the use of a cancelable context to prevent a
 // goroutine leak. By the end of the example function, the goroutine started
 // by gen will return without leaking.
-func TestExampleWithCancel() {
+func TestExampleWithCancel(t *testing.T) {
 	// gen generates integers in a separate goroutine and
 	// sends them to the returned channel.
 	// The callers of gen need to cancel the context once
@@ -56,7 +60,7 @@ func TestExampleWithCancel() {
 
 // This example passes a context with an arbitrary deadline to tell a blocking
 // function that it should abandon its work as soon as it gets to it.
-func TestExampleWithDeadline() {
+func TestExampleWithDeadline(t *testing.T) {
 	d := time.Now().Add(shortDuration)
 	ctx, cancel := context.WithDeadline(context.Background(), d)
 
@@ -66,7 +70,7 @@ func TestExampleWithDeadline() {
 	defer cancel()
 
 	select {
-	case <-time.After(1 * time.Second):
+	case <-time.After(2 * time.Second):
 		fmt.Println("overslept")
 	case <-ctx.Done():
 		fmt.Println(ctx.Err())
@@ -78,7 +82,7 @@ func TestExampleWithDeadline() {
 
 // This example passes a context with a timeout to tell a blocking function that
 // it should abandon its work after the timeout elapses.
-func ExampleWithTimeout() {
+func TestExampleWithTimeout(t *testing.T) {
 	// Pass a context with a timeout to tell a blocking function that it
 	// should abandon its work after the timeout elapses.
 	ctx, cancel := context.WithTimeout(context.Background(), shortDuration)
@@ -97,7 +101,7 @@ func ExampleWithTimeout() {
 
 // This example demonstrates how a value can be passed to the context
 // and also how to retrieve it if it exists.
-func ExampleWithValue() {
+func TestExampleWithValue(t *testing.T) {
 	type favContextKey string
 
 	f := func(ctx context.Context, k favContextKey) {
@@ -117,4 +121,28 @@ func ExampleWithValue() {
 	// Output:
 	// found value: Go
 	// key not found: color
+}
+
+func TestHttpRequestWithContext(t *testing.T) {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "http://www.golang.org", nil)
+	if err != nil {
+		fmt.Println("error: ", err)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+	// Attach it to our request.
+	req = req.WithContext(ctx)
+	// Get our resp.
+	resp, err := client.Do(req)
+	cancel()
+	if err != nil {
+		fmt.Println("error: ", err)
+		return
+	}
+
+	// Print the page to stdout
+	io.Copy(os.Stdout, resp.Body)
 }
