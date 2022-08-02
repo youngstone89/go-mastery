@@ -1,4 +1,4 @@
-package singleton_test
+package creationalpatterns_test
 
 import "testing"
 
