@@ -6,11 +6,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
- 
-make: *** No rule to make target `all'.  Stop.
- 
 
-# Make data base, printed on Thu Jul 28 13:41:52 2022
+# Make data base, printed on Tue Aug  2 11:25:06 2022
 
 # Variables
 
@@ -21,12 +18,9 @@ make: *** No rule to make target `all'.  Stop.
 # environment
 PROVIDE_FULLSTACK_ACTION = true
 # environment
-FIG_WORKFLOWS_KEYBIND = ^f
-# environment
 NVM_INC = /Users/yeongseokkim/.nvm/versions/node/v16.1.0/include/node
 # automatic
 ?D = $(patsubst %/,%,$(dir $?))
- 
 # automatic
 @D = $(patsubst %/,%,$(dir $@))
 # automatic
@@ -72,13 +66,13 @@ KUBECONFIG = /Users/yeongseokkim/.kube/config:/Users/yeongseokkim/.kube/nuance-p
 # environment
 UUID = c0a7224b-7bfa-4fbc-822f-ad12609e5690
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.uJgJh34Bfj/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.T9ZjVXhrmi/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
 TTY = not a tty
 # environment
-FIG_PID = 93965
+FIG_PID = 3961
 # environment
 PWD = /Users/yeongseokkim/go/src/go-mastery
 # environment
@@ -188,9 +182,9 @@ GITLAB_TOKEN = ygVyByexd7UuLXPSxSiE
 # environment
 LANG = C
 # environment
-VSCODE_PID = 93951
+VSCODE_PID = 3941
 # variable set hash-table stats:
-# Load=87/1024=8%, Rehash=0, Collisions=5/108=5%
+# Load=86/1024=8%, Rehash=0, Collisions=5/107=5%
 
 # Pattern-specific Variable Values
 
@@ -198,7 +192,7 @@ VSCODE_PID = 93951
 
 # Directories
 
-# . (device 16777225, inode 7177567): 15 files, no impossibilities.
+# . (device 16777222, inode 7177567): 15 files, no impossibilities.
 
 # 15 files, no impossibilities in 1 directories.
 
@@ -272,6 +266,8 @@ GNUmakefile:
 # strcache size: total = 0 / max = 0 / min = 4096 / avg = 0
 # strcache free: total = 0 / max = 0 / min = 4096 / avg = 0
 
-# Finished Make data base on Thu Jul 28 13:41:52 2022
+# Finished Make data base on Tue Aug  2 11:25:06 2022
 
+ 
+make: *** No rule to make target `all'.  Stop.
  
