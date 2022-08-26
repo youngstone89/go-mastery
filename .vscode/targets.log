@@ -6,8 +6,12 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
+make: *** No rule to make target `all'.  Stop.
+ 
 
-# Make data base, printed on Thu Aug 18 09:20:24 2022
+ 
+# Make data base, printed on Fri Aug 26 22:15:42 2022
 
 # Variables
 
@@ -66,13 +70,13 @@ KUBECONFIG = /Users/yeongseokkim/.kube/config:/Users/yeongseokkim/.kube/nuance-p
 # environment
 UUID = c0a7224b-7bfa-4fbc-822f-ad12609e5690
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.RxgY30JRjy/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.F0MEe0qTBh/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
 TTY = not a tty
 # environment
-FIG_PID = 3951
+FIG_PID = 5608
 # environment
 PWD = /Users/yeongseokkim/go/src/go-mastery
 # environment
@@ -81,10 +85,11 @@ ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 GOMODCACHE = /Users/yeongseokkim/go/pkg/mod
 # environment
 HOME = /Users/yeongseokkim
+ 
 # default
 MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/yeongseokkim/Library/Application Support/Code/CachedData/6d9b74a70ca9c7733b29f0456fd8195364076dda
+VSCODE_CODE_CACHE_PATH = /Users/yeongseokkim/Library/Application Support/Code/CachedData/e4503b30fc78200f846c62cf8091b76ff5547662
 # environment
 LOGNAME = yeongseokkim
 # environment
@@ -134,7 +139,7 @@ TMPDIR = /var/folders/2c/k5j_pm597pqdjwvj8ytvr74h0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/yeongseokkim/Library/Application Support/Code/1.70.1-main.sock
+VSCODE_IPC_HOOK = /Users/yeongseokkim/Library/Application Support/Code/1.70.2-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -146,7 +151,7 @@ MFLAGS = -Rrqp
 # environment
 NVM_DIR = /Users/yeongseokkim/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.283709356.283709362
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.286260987.286260993
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # environment
@@ -182,7 +187,7 @@ GITLAB_TOKEN = ygVyByexd7UuLXPSxSiE
 # environment
 LANG = C
 # environment
-VSCODE_PID = 3943
+VSCODE_PID = 5600
 # variable set hash-table stats:
 # Load=86/1024=8%, Rehash=0, Collisions=5/107=5%
 
@@ -192,9 +197,9 @@ VSCODE_PID = 3943
 
 # Directories
 
-# . (device 16777225, inode 7177567): 15 files, no impossibilities.
+# . (device 16777225, inode 7177567): 18 files, no impossibilities.
 
-# 15 files, no impossibilities in 1 directories.
+# 18 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -266,8 +271,6 @@ GNUmakefile:
 # strcache size: total = 0 / max = 0 / min = 4096 / avg = 0
 # strcache free: total = 0 / max = 0 / min = 4096 / avg = 0
 
-# Finished Make data base on Thu Aug 18 09:20:24 2022
+# Finished Make data base on Fri Aug 26 22:15:42 2022
 
- 
-make: *** No rule to make target `all'.  Stop.
  
